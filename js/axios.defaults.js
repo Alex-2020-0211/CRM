@@ -1,5 +1,7 @@
 // axios二次封装
-axios.defaults.baseURL = "http://127.0.0.1:8888";
+axios.defaults.baseURL = "http://127.0.0.1:8888"; // 基本路径
+
+axios.defaults.withCredentials = true; // 请求带上cookie
 
 // 数据形式-表单
 axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
