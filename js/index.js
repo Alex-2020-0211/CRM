@@ -1,4 +1,7 @@
 $(function(){
+    // 获取元素
+    let $navBoxList = $(".navBox>a");
+    let $itemBoxList = null;
     init();
 
     // 发布
@@ -79,6 +82,51 @@ $(function(){
             `
         }
         $(".menuBox").html(str);
+        $itemBoxList = $(".menuBox").find(".itemBox");
+    })
+    // 切换
+    function handGroup(index){
+        let $group1 = $itemBoxList.filter((_,item)=>{
+            let text = $(item).attr("text");
+            return text === "客户管理"
+        })
+        let $group2 = $itemBoxList.filter((_,item)=>{
+            let text = $(item).attr("text");
+            return /^(员工管理|部门管理|职位管理)/.test(text);
+        })
+        if(index === 0){
+            $group1.css("display","block");
+            $group2.css("display","none");
+        }else if(index === 1){
+            $group1.css("display","none");
+            $group2.css("display","block");
+        }
+    }
+    $plan.add(power=>{
+        // 默认显示
+        let initIndex = power.includes("customer") ? 0 : 1;
+        $navBoxList.eq(initIndex).addClass("active").siblings().removeClass("active");
+        handGroup(initIndex); 
+        // 点击切换
+        $navBoxList.click(function(){
+            let index = $(this).index();
+            let text = $(this).html().trim();
+            if((text === "客户管理") && !/customerall/.test(power) || (text === "组织结构") && !/userhandle|departhandle|jobhandle/.test(power)){
+                alert("无权访问~");
+                return;
+            }
+            if(index === initIndex) return;
+            $(this).addClass("active").siblings().removeClass("active");
+            handGroup(index);
+            initIndex = index;
+        })
+    })
+    // 默认的iframe
+    $plan.add(power=>{
+        let url = "page/customerlist.html";
+        if(power.includes("customerall")){
+            $(".iframeBox").attr("src",url);
+        }
     })
     
     async function init(){
@@ -100,7 +148,7 @@ $(function(){
 
         baseInfo.code === 0 ? baseInfo = baseInfo.data : null;
         power.code === 0 ? power = power.power : null;
-
+        // 订阅
         $plan.fire(power,baseInfo);
     }
 })
